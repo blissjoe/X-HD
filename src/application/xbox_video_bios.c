@@ -87,14 +87,24 @@ void set_video_mode_bios(const xbox_encoder xb_encoder, const uint32_t mode, con
     const bool widescreen = mode & XBOX_VIDEO_MODE_BIT_WIDESCREEN;
     const bool rgb = mode & XBOX_VIDEO_MODE_BIT_SCART;
 
+    debug_log("Mode: 0x%08X avinfo: 0x%08X index: 0x%02X ws: %d rgb: %d\r\n", mode, avinfo, mode_index, widescreen, rgb);
+
     set_adv_video_mode_bios(video_mode, widescreen, rgb);
 }
 
 void set_adv_video_mode_bios(const VideoMode vm, const bool widescreen, const bool rgb) {
-    // Force pixel repeat to 1 (for forcing VIC)
-    adv7511_write_register(0x3B, 0b01100000);
+    // Leave 0x3B at default (PR_MODE=00, VIC_MANUAL=0) - same as bootloader.
+    // Pixel repetition and VIC auto-detection from input timing.
+    // Aspect ratio and VIC are conveyed to the TV via AVI InfoFrame only.
 
-    // Convert RGB to YCbCr if in RGB mode
+    // When source is RGB, load the correct CSC coefficients for the resolution:
+    // BT.709 for HD (720p/1080i), BT.601 for SD (480p/576p)
+    if (rgb) {
+        adv7511_apply_csc(vm.h_active >= 1280
+            ? (uint8_t *)CscRgbToYuv709
+            : (uint8_t *)CscRgbToYuv601);
+    }
+    // Enable CSC only when source is RGB
     adv7511_update_register(0x18, 0b10000000, rgb ? 0b10000000 : 0b00000000);
 
     adv7511_write_register(0x35, (uint8_t)(vm.hs_delay >> 2));
@@ -119,20 +129,27 @@ void set_adv_video_mode_bios(const VideoMode vm, const bool widescreen, const bo
 
     uint8_t vic = get_vic_from_video_mode(&vm, widescreen);
 
-    // Set the vic from the table
+    // 720p and 1080i are inherently 16:9, force widescreen for AVI InfoFrame
+    bool ws_infoframe = widescreen
+        || vic == VIC_03_480p_60_16_9
+        || vic == VIC_04_720p_60_16_9
+        || vic == VIC_05_1080i_60_16_9;
+
+    // Set the vic for internal tracking and AVI InfoFrame
     adv7511_write_register(0x3C, vic);
 
-    update_avi_infoframe(widescreen);
+    update_avi_infoframe(ws_infoframe, rgb, vic);
 }
 
 uint8_t get_vic_from_video_mode(const VideoMode * const vm, const bool widescreen) {
     uint8_t vic;
+
     switch (vm->h_active) {
         case 640:
         if (vm->v_active == 576) {
             vic = widescreen ? VIC_18_576p_50_16_9 : VIC_17_576p_50__4_3;
         } else {
-            vic = widescreen ? VIC_02_480p_60__4_3 : VIC_03_480p_60_16_9;
+            vic = widescreen ? VIC_03_480p_60_16_9 : VIC_02_480p_60__4_3;
         }
         break;
 
@@ -140,7 +157,7 @@ uint8_t get_vic_from_video_mode(const VideoMode * const vm, const bool widescree
         if (vm->v_active == 576) {
             vic = widescreen ? VIC_18_576p_50_16_9 : VIC_17_576p_50__4_3;
         } else {
-            vic = widescreen ? VIC_02_480p_60__4_3 : VIC_03_480p_60_16_9;
+            vic = widescreen ? VIC_03_480p_60_16_9 : VIC_02_480p_60__4_3;
         }
         break;
 
