@@ -75,9 +75,11 @@ void set_video_mode_bios(const xbox_encoder xb_encoder, const uint32_t mode, con
     VideoMode video_mode = table[mode_index - 1];
 
     // TODO: Figure out if the avinfo is a reliable source for the interlaced flag
-    // const bool interlaced = mode_index == 0x0e;
     // most modes are progressive on the bus...
-    const bool interlaced = ((avinfo & XBOX_AVINFO_INTERLACED) || (avinfo & XBOX_AVINFO_FILED)) && (mode_index == 0x0e);
+    //     const bool interlaced = ((avinfo & XBOX_AVINFO_INTERLACED) || (avinfo & XBOX_AVINFO_FILED)) &&
+    //         ((mode_index == 0x0e) || (mode_index == 0x0d));
+    // For now its hardcoded to 1080i
+    const bool interlaced = ((mode_index == 0x0e) || (mode_index == 0x0d));
 
     if (interlaced) {
         video_mode.v_active = video_mode.v_active / 2;
