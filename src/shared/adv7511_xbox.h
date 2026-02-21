@@ -13,6 +13,6 @@ void init_adv_encoder_specific(const xbox_encoder xb_encoder);
 
 void init_adv_audio();
 
-void update_avi_infoframe(const bool widescreen);
+void update_avi_infoframe(const bool widescreen, const bool rgb, const uint8_t vic);
 
 #endif // __ADV7511_XBOX_H__
