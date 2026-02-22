@@ -36,6 +36,7 @@ XHDUpdater source code: [https://github.com/Team-Resurgent/XHDUpdater](https://g
 
 ## Important Notes
 
+- In order to correctly use with Cerbios V3.1.0 + please enable Screenshots in ini file, as this enables communication of widescreen/interlace modes to fw.
 - Backup the existing firmware before attempting to use this (use the ST Link V2 for this)
 - This firmware is **NOT** supported by the HD+ creator, so don't got bother MakeMHz for support
 - Before attempting to use this, make sure your install works properly with the original FW + patched bios provided by MakeMHz
@@ -48,3 +49,4 @@ XHDUpdater source code: [https://github.com/Team-Resurgent/XHDUpdater](https://g
 - Check all video modes render correctly (on-going)
 
 — EqUiNoX
+
