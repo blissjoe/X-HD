@@ -17,6 +17,8 @@ void init_adv(adv7511 *encoder, const xbox_encoder xb_encoder) {
     adv7511_power_up(encoder);
     HAL_Delay(50);
 
+    adv7511_disable_video();
+
     // [3:0] Set video input mode to RGB/YCbCr 4:4:4, 12bit databus DDR
     // [7:4] Audio to 48kHz
     adv7511_write_register(0x15, 0b00100101);
@@ -36,6 +38,12 @@ void init_adv(adv7511 *encoder, const xbox_encoder xb_encoder) {
     // [0] Enable DE generation. This is derived from HSYNC,VSYNC for video active framing
     adv7511_update_register(0x17, 0b00000001, 0b00000001);
 
+    // Disable CSC
+    adv7511_update_register(0x18, 0b10000000, 0b00000000);
+
+    // Set default infoframe
+    update_avi_infoframe(false, false, VIC_02_480p_60__4_3);
+
     // Set Output to HDMI Mode (Instead of DVI Mode)
     // [7] HDCP Disabled
     // [6:5] Must be set to default value 00
@@ -49,6 +57,8 @@ void init_adv(adv7511 *encoder, const xbox_encoder xb_encoder) {
     adv7511_update_register(0x40, 0b10000000, 0b10000000);
 
     init_adv_audio();
+
+    adv7511_enable_video();
 }
 
 void init_adv_encoder_specific(const xbox_encoder xb_encoder) {

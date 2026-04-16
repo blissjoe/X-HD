@@ -102,7 +102,6 @@ static const VideoMode FOCUS_TABLE[] = {
     {143, 26,  640,  576,  79, 64, 22,  2, 0}  // 12 640x576_FPAR_PAL_RGB    OK
 };
 
-void bios_init();
 void bios_loop(xbox_encoder * xb_encoder);
 
 #endif // __XBOX_VIDEO_BIOS_H__

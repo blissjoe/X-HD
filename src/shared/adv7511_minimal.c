@@ -32,13 +32,13 @@ void adv7511_struct_init(adv7511 *encoder) {
 void adv7511_power_up(adv7511 *encoder) {
     // Power up the encoder
     adv7511_write_register(0x41, 0x10); // Power up
-    HAL_Delay(20);
+    HAL_Delay(50);
 
     // Reset
     adv7511_write_register(0x41, 0x00);
-    HAL_Delay(20);
+    HAL_Delay(50);
     adv7511_write_register(0x41, 0x10);
-    HAL_Delay(20);
+    HAL_Delay(50);
 }
 
 void adv_handle_interrupts(adv7511 *encoder) {
@@ -61,4 +61,30 @@ void adv_handle_interrupts(adv7511 *encoder) {
         // Re-enable interrupts
         adv7511_update_register(0x96, 0b11000000, 0xC0);
     }
+}
+
+inline void adv7511_disable_video() {
+    // [0] Gate ouput
+    adv7511_update_register(0xD6, 0b00000001, 0b00000001);
+}
+
+inline void adv7511_enable_video() {
+    // [1] Enable ouput
+    adv7511_update_register(0xD6, 0b00000001, 0b00000000);
+}
+
+inline void adv7511_power_down_tmds() {
+    // [5] Channel 0 power down
+    // [4] Channel 1 power down
+    // [3] Channel 2 power down
+    // [2] Clock Driver power down
+    adv7511_update_register(0xA1, 0b00111100, 0b00111100);
+}
+
+inline void adv7511_power_up_tmds() {
+    // [5] Channel 0 power up
+    // [4] Channel 1 power up
+    // [3] Channel 2 power up
+    // [2] Clock Driver power up
+    adv7511_update_register(0xA1, 0b00111100, 0b00000000);
 }

@@ -155,10 +155,4 @@ void adv7511_write_cec(const uint8_t address, uint8_t value);
 
 void adv7511_apply_csc(const uint8_t * const coefficients);
 
-// New stuff
-void adv7511_disable_video();
-void adv7511_enable_video();
-void adv7511_power_down_tmds();
-void adv7511_power_up_tmds();
-
 #endif // __ADV7511_H__

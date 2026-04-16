@@ -9,11 +9,6 @@ void set_video_mode_bios(const xbox_encoder xb_encoder, const uint32_t mode, con
 void set_adv_video_mode_bios(const VideoMode video_mode, const bool widescreen, const bool rgb);
 uint8_t get_vic_from_video_mode(const VideoMode * const vm, const bool widescreen);
 
-void bios_init() {
-    // Set up the color space correction for RGB signals, disabled by default
-    adv7511_apply_csc((uint8_t *)CscRgbToYuv601);
-}
-
 void bios_loop(xbox_encoder * xb_encoder) {
     static uint32_t current_mode = 0;
     static uint32_t current_avinfo = 0;

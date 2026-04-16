@@ -34,4 +34,10 @@ void adv7511_struct_init(adv7511 *encoder);
 
 void adv_handle_interrupts(adv7511 *encoder);
 
+// New stuff
+void adv7511_disable_video();
+void adv7511_enable_video();
+void adv7511_power_down_tmds();
+void adv7511_power_up_tmds();
+
 #endif // __ADV7511_MINIMAL_H__

@@ -58,8 +58,6 @@ int main(void)
 
     init_adv(&encoder, xb_encoder);
 
-    bios_init();
-
     smbus_i2c_init();
 
     while (true)
